@@ -5,11 +5,11 @@ import (
 	"item-service/config"
 	"item-service/internal/dto"
 	"item-service/internal/models"
-	"item-service/internal/repository"
 	"math/rand"
 	"time"
 
 	"github.com/dtm-labs/client/dtmcli"
+	"gorm.io/gorm"
 )
 
 type (
@@ -18,7 +18,7 @@ type (
 	}
 
 	OrderServiceImpl struct {
-		repo   repository.OrderRepository
+		db     *gorm.DB
 		config config.Config
 	}
 )
@@ -30,11 +30,11 @@ func (s *OrderServiceImpl) Create(ctx context.Context, req dto.CreateOrderReques
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
 
-	_, err = s.repo.Create(ctx, models.Order{
+	err = s.db.Create(models.Order{
 		ID:      int8(r1.Intn(10000000)),
 		ItemIDs: req.ItemIDs,
 		Status:  "pending",
-	})
+	}).Error
 
 	if err != nil {
 		return models.Order{}, 500, err
@@ -64,12 +64,9 @@ func (s *OrderServiceImpl) Create(ctx context.Context, req dto.CreateOrderReques
 	return
 }
 
-func NewItemService(itemRepo repository.OrderRepository, config config.Config) OrderService {
-	if itemRepo == nil {
-		panic("Item Repository is nil")
-	}
+func NewItemService(db *gorm.DB, config config.Config) OrderService {
 	return &OrderServiceImpl{
-		repo:   itemRepo,
+		db:     db,
 		config: config,
 	}
 }
