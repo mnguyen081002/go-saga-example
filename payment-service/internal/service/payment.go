@@ -6,7 +6,6 @@ import (
 	"item-service/config"
 	"item-service/internal/dto"
 	"item-service/internal/models"
-	"item-service/internal/repository"
 
 	"gorm.io/gorm"
 )
@@ -18,20 +17,15 @@ type (
 	}
 
 	PaymentServiceImpl struct {
-		repo           repository.PaymentRepository
-		userWalletRepo repository.UserWalletRepository
-		config         config.Config
+		db     *gorm.DB
+		config config.Config
 	}
 )
 
-func NewPaymentService(paymentRepo repository.PaymentRepository, userWalletRepo repository.UserWalletRepository, config config.Config) PaymentService {
-	if paymentRepo == nil {
-		panic("Item Repository is nil")
-	}
+func NewPaymentService(db *gorm.DB, config config.Config) PaymentService {
 	return &PaymentServiceImpl{
-		repo:           paymentRepo,
-		userWalletRepo: userWalletRepo,
-		config:         config,
+		db:     db,
+		config: config,
 	}
 }
 
@@ -44,13 +38,13 @@ func (s *PaymentServiceImpl) CreateTransaction(ctx context.Context, req dto.Crea
 		GID:    req.GID,
 	}
 
-	if err := s.repo.DB().Create(&item).Error; err != nil {
+	if err := s.db.Create(&item).Error; err != nil {
 		return models.Transaction{}, 500, fmt.Errorf("error creating payment: %v", err)
 	}
 
 	uw := models.UserWallet{}
 
-	if err = s.userWalletRepo.DB().First(&uw, "user_id = ?", req.UserID).Error; err != nil {
+	if err = s.db.First(&uw, "user_id = ?", req.UserID).Error; err != nil {
 		return models.Transaction{}, 500, err
 	}
 
@@ -58,12 +52,12 @@ func (s *PaymentServiceImpl) CreateTransaction(ctx context.Context, req dto.Crea
 		return models.Transaction{}, 500, fmt.Errorf("Insufficient Balance")
 	}
 
-	if err := s.userWalletRepo.DB().Model(models.UserWallet{}).Where("user_id = ?", req.UserID).Update("balance", uw.Balance-req.Amount).Error; err != nil {
+	if err := s.db.Model(models.UserWallet{}).Where("user_id = ?", req.UserID).Update("balance", uw.Balance-req.Amount).Error; err != nil {
 		return models.Transaction{}, 500, fmt.Errorf("error creating payment: %v", err)
 	}
 
 	item.Status = "success"
-	if err := s.repo.DB().Updates(&item).Error; err != nil {
+	if err := s.db.Model(models.Transaction{}).Updates(&item).Error; err != nil {
 		return models.Transaction{}, 500, fmt.Errorf("error creating payment: %v", err)
 	}
 
@@ -72,7 +66,7 @@ func (s *PaymentServiceImpl) CreateTransaction(ctx context.Context, req dto.Crea
 
 func (s *PaymentServiceImpl) Refund(ctx context.Context, req dto.CreateTransactionRequest) (item models.Transaction, statusCode int, err error) {
 
-	err = s.repo.DB().DB.First(&item, "g_id = ? and status = ?", req.GID, "pending").Error
+	err = s.db.First(&item, "g_id = ? and status = ?", req.GID, "pending").Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return models.Transaction{}, 200, fmt.Errorf("Transaction not found")
@@ -81,14 +75,14 @@ func (s *PaymentServiceImpl) Refund(ctx context.Context, req dto.CreateTransacti
 	}
 
 	userWallet := models.UserWallet{}
-	err = s.userWalletRepo.DB().First(&userWallet, "user_id = ?", req.UserID).Error
+	err = s.db.First(&userWallet, "user_id = ?", req.UserID).Error
 
 	if err != nil {
 		return models.Transaction{}, 500, err
 	}
 	userWallet.Balance = userWallet.Balance + req.Amount
 
-	err = s.userWalletRepo.DB().Model(userWallet).Update("balance", userWallet.Balance).Where("user_id = ?", req.UserID).Error
+	err = s.db.Model(userWallet).Update("balance", userWallet.Balance).Where("user_id = ?", req.UserID).Error
 	if err != nil {
 		return models.Transaction{}, 500, err
 	}
@@ -100,7 +94,7 @@ func (s *PaymentServiceImpl) Refund(ctx context.Context, req dto.CreateTransacti
 		GID:    req.GID,
 	}
 
-	if err := s.repo.DB().Model(models.Transaction{}).Where("g_id = ? and status = ?", req.GID, "pending").Update("status", "refund").Error; err != nil {
+	if err := s.db.Model(models.Transaction{}).Where("g_id = ? and status = ?", req.GID, "pending").Update("status", "refund").Error; err != nil {
 		return models.Transaction{}, 500, fmt.Errorf("error update payment: %v", err)
 	}
 

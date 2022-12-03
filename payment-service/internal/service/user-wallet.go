@@ -6,7 +6,8 @@ import (
 	"item-service/config"
 	"item-service/internal/dto"
 	"item-service/internal/models"
-	"item-service/internal/repository"
+
+	"gorm.io/gorm"
 )
 
 type (
@@ -15,20 +16,14 @@ type (
 	}
 
 	UserWalletServiceImpl struct {
-		repo   repository.UserWalletRepository
+		db     *gorm.DB
 		config config.Config
 	}
 )
 
-func NewUserWalletService(repo repository.UserWalletRepository, config config.Config) UserWalletService {
-	if repo == nil {
-		panic("Item Repository is nil")
-	}
-
-	fmt.Println("repo", repo)
-
+func NewUserWalletService(db *gorm.DB, config config.Config) UserWalletService {
 	return &UserWalletServiceImpl{
-		repo:   repo,
+		db:     db,
 		config: config,
 	}
 }
@@ -40,7 +35,7 @@ func (s *UserWalletServiceImpl) Create(ctx context.Context, req dto.CreateUserWa
 		Balance: req.Balance,
 	}
 
-	if err := s.repo.DB().Create(&item).Error; err != nil {
+	if err := s.db.Create(&item).Error; err != nil {
 		return models.UserWallet{}, 500, fmt.Errorf("error creating payment: %v", err)
 	}
 
