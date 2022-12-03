@@ -45,7 +45,6 @@ func inject() fx.Option {
 		),
 		db.GormModule,
 		logger.LoggerModule,
-		repository.Module,
 		service.Module,
 		controller.Module,
 		//nsq.ProducerModule,
