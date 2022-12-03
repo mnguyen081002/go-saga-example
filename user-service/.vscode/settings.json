@@ -1,5 +1,0 @@
-{
-  "yaml.schemas": {
-    "https://raw.githubusercontent.com/deployphp/deployer/master/src/schema.json": "file:///home/titus/Desktop/Projects/github/item-service/deploy/deploy.yml"
-  }
-}
