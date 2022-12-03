@@ -2,6 +2,7 @@ package http
 
 import (
 	"bytes"
+	"io"
 	"item-service/config"
 	"item-service/utils/constants"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 type bodyLogWriter struct {
