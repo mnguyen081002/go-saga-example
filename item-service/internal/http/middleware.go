@@ -2,6 +2,7 @@ package http
 
 import (
 	"bytes"
+	"io"
 	"item-service/config"
 	"item-service/utils/constants"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 type bodyLogWriter struct {
@@ -115,7 +117,7 @@ func (e *GinMiddleware) ErrorHandler(logger *zap.Logger) gin.HandlerFunc {
 
 		c.Next()
 		if len(c.Errors) > 0 {
-			logger.Error("Error", zap.String("Error", c.Errors.String()))
+			// logger.Error("Error", zap.String("Error", c.Errors.String()))
 			//var message string
 			//statusCode := http.StatusInternalServerError
 			//err := c.Errors.Last()

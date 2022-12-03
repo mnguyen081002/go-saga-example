@@ -21,7 +21,7 @@ type Database struct {
 	logger *zap.Logger
 }
 
-func NewDatabase(config config.Config, logger *zap.Logger) *Database {
+func NewDatabase(config config.Config, logger *zap.Logger) *gorm.DB {
 	var err error
 	var sqlDB *sql.DB
 
@@ -43,7 +43,7 @@ func NewDatabase(config config.Config, logger *zap.Logger) *Database {
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(100)
 
-	return db
+	return db.DB
 }
 
 func getDatabaseInstance(config config.Config) (db *gorm.DB, err error) {
@@ -60,7 +60,6 @@ func getDatabaseInstance(config config.Config) (db *gorm.DB, err error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to connect database: %w", err)
 		}
-		break
 	case "postgres":
 		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disable TimeZone=Asia/Shanghai",
 			config.Database.Host, config.Database.Username, config.Database.Password, config.Database.Name, config.Database.Port)
@@ -70,12 +69,12 @@ func getDatabaseInstance(config config.Config) (db *gorm.DB, err error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to connect database: %w", err)
 		}
-		break
 	}
 	return db, nil
 }
 
-func (d Database) RegisterTables() {
+func (d *Database) RegisterTables() {
+	fmt.Println(d.DB)
 	err := d.DB.AutoMigrate(
 		models.Item{},
 	)

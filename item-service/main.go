@@ -6,7 +6,6 @@ import (
 	"item-service/internal/http"
 	"item-service/internal/lib/db"
 	"item-service/internal/lib/logger"
-	"item-service/internal/repository"
 	"item-service/internal/service"
 	"item-service/utils"
 
@@ -46,7 +45,6 @@ func inject() fx.Option {
 		),
 		db.GormModule,
 		logger.LoggerModule,
-		repository.Module,
 		service.Module,
 		controller.Module,
 		//nsq.ProducerModule,
