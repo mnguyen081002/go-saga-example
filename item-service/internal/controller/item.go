@@ -26,6 +26,7 @@ func InitItemController(c *gin.RouterGroup, groupService service.ItemService, lo
 	g.POST("/create", controller.Create)
 	g.POST("/calculate-stock", controller.CalculateStock)
 	g.POST("/compensation-stock", controller.CalculateStock)
+	g.POST("/get-by-ids", controller.GetByIDs)
 }
 
 func (b *ItemController) GetByID(c *gin.Context) {
@@ -52,7 +53,6 @@ func (b *ItemController) Search(c *gin.Context) {
 		return
 	}
 	b.ResponseList(c, "success", total, res)
-	return
 }
 
 func (b *ItemController) Create(c *gin.Context) {
@@ -75,7 +75,7 @@ func (b *ItemController) CalculateStock(c *gin.Context) {
 		b.ResponseError(c, http.StatusBadRequest, []error{err})
 		return
 	}
-	statusCode, err := b.ItemService.CalculateStock(c, req.ItemID, req.Quantity)
+	statusCode, err := b.ItemService.CalculateStock(c, req.OrderItems)
 	if err != nil {
 		b.ResponseError(c, statusCode, []error{err})
 		return
@@ -89,10 +89,24 @@ func (b *ItemController) CompensationStock(c *gin.Context) {
 		b.ResponseError(c, http.StatusBadRequest, []error{err})
 		return
 	}
-	statusCode, err := b.ItemService.CompensationStock(c, req.ItemID, req.Quantity)
+	statusCode, err := b.ItemService.CompensationStock(c, req.OrderItems)
 	if err != nil {
 		b.ResponseError(c, statusCode, []error{err})
 		return
 	}
 	b.Response(c, http.StatusOK, "success", nil)
+}
+
+func (b *ItemController) GetByIDs(c *gin.Context) {
+	var req dto.GetByIDsRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		b.ResponseError(c, http.StatusBadRequest, []error{err})
+		return
+	}
+	res, statusCode, err := b.ItemService.GetByIDs(c, req.IDs)
+	if err != nil {
+		b.ResponseError(c, statusCode, []error{err})
+		return
+	}
+	b.Response(c, http.StatusOK, "success", res)
 }

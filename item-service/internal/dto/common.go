@@ -26,5 +26,5 @@ type Paging struct {
 }
 
 type GetByIDsRequest struct {
-	IDs []int64 `json:"ids"`
+	IDs []string `json:"ids"`
 }

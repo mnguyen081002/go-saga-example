@@ -3,7 +3,7 @@ debug: true
 contextTimeout: 5
 
 server:
-  port: "8081"
+  port: "80"
   host: "0.0.0.0"
   env: "local"
   useRedis: false

@@ -21,7 +21,7 @@ func InitPaymentController(c *gin.RouterGroup, groupService service.PaymentServi
 		logger:         logger,
 	}
 	g := c.Group("/payment")
-	g.POST("/purchase", controller.Create)
+	g.POST("/transaction", controller.Create)
 	g.POST("/refund", controller.Refund)
 }
 

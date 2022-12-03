@@ -27,6 +27,10 @@ type SearchItemRequest struct {
 }
 
 type CalculateStockRequest struct {
+	OrderItems []OrderItem `json:"order_items"`
+}
+
+type OrderItem struct {
 	Quantity int64  `json:"quantity"`
 	ItemID   string `json:"item_id"`
 }

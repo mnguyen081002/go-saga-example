@@ -38,6 +38,8 @@ func (s *PaymentServiceImpl) CreateTransaction(ctx context.Context, req dto.Crea
 		GID:    req.GID,
 	}
 
+	fmt.Println(req.GID)
+
 	if err := s.db.Create(&item).Error; err != nil {
 		return models.Transaction{}, 500, fmt.Errorf("error creating payment: %v", err)
 	}
@@ -57,16 +59,16 @@ func (s *PaymentServiceImpl) CreateTransaction(ctx context.Context, req dto.Crea
 	}
 
 	item.Status = "success"
-	if err := s.db.Model(models.Transaction{}).Updates(&item).Error; err != nil {
+	if err := s.db.Model(models.Transaction{}).Where("g_id = ?", req.GID).Updates(&item).Error; err != nil {
 		return models.Transaction{}, 500, fmt.Errorf("error creating payment: %v", err)
 	}
 
-	return item, 200, err
+	return item, 200, nil
 }
 
 func (s *PaymentServiceImpl) Refund(ctx context.Context, req dto.CreateTransactionRequest) (item models.Transaction, statusCode int, err error) {
 
-	err = s.db.First(&item, "g_id = ? and status = ?", req.GID, "pending").Error
+	err = s.db.First(&item, "g_id = ? and status = ?", req.GID, "success").Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return models.Transaction{}, 200, fmt.Errorf("Transaction not found")
