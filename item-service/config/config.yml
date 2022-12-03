@@ -9,13 +9,11 @@ server:
   useRedis: false
 
 services:
-  categoryServiceURL: "http://localhost:8081/api/category/"
-  variantServiceURL: "http://localhost:8082/api/variant/"
 
 database:
   driver: "postgres"
   host: "localhost"
   port: 5432
-  username: "titus"
-  password: "saota1278"
+  username: "postgres"
+  password: "postgres"
   name: "item-service"
