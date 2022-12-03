@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"item-service/config"
 	"item-service/internal/dto"
 	"item-service/internal/models"
@@ -31,12 +30,15 @@ func (s *OrderServiceImpl) Create(ctx context.Context, req dto.CreateOrderReques
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
 
-	fmt.Print()
-	s.repo.Create(ctx, models.Order{
+	_, err = s.repo.Create(ctx, models.Order{
 		ID:      int8(r1.Intn(10000000)),
 		ItemIDs: req.ItemIDs,
 		Status:  "pending",
 	})
+
+	if err != nil {
+		return models.Order{}, 500, err
+	}
 
 	reqItem := map[string]interface{}{
 		"quantity": 1,

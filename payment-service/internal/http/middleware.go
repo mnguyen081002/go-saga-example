@@ -46,12 +46,25 @@ func (e *GinMiddleware) Logger(zapLogger *zap.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Next()
 
-		blw := &bodyLogWriter{body: bytes.NewBufferString(""), ResponseWriter: c.Writer}
-		c.Writer = blw
+		fields := []zapcore.Field{}
 
 		start := time.Now()
 		path := c.Request.URL.Path
 		raw := c.Request.URL.RawQuery
+
+		var body []byte
+		var buf bytes.Buffer
+		tee := io.TeeReader(c.Request.Body, &buf)
+		body, _ = io.ReadAll(tee)
+
+		c.Request.Body = io.NopCloser(&buf)
+		fields = append(fields, zap.String("Body", string(body)))
+		fields = append(fields, zap.String("Path", path))
+
+		blw := &bodyLogWriter{body: bytes.NewBufferString(""), ResponseWriter: c.Writer}
+		c.Writer = blw
+
+		c.Next()
 
 		end := time.Now()
 		latency := end.Sub(start)
@@ -59,16 +72,21 @@ func (e *GinMiddleware) Logger(zapLogger *zap.Logger) gin.HandlerFunc {
 		method := c.Request.Method
 		statusCode := c.Writer.Status()
 		comment := c.Errors.ByType(gin.ErrorTypePrivate).String()
-		zapLogger.Info("Request",
-			zap.String("Path", path),
-			zap.String("Raw", raw),
-			zap.String("ClientIP", clientIP),
-			zap.String("Method", method),
-			zap.Int("StatusCode", statusCode),
-			zap.String("Comment", comment),
-			zap.Duration("Latency", latency),
-			zap.String("response", blw.body.String()),
-		)
+
+		fields = append(fields, zap.String("Raw", raw))
+		fields = append(fields, zap.String("ClientIP", clientIP))
+		fields = append(fields, zap.String("Method", method))
+		fields = append(fields, zap.Int("StatusCode", statusCode))
+		fields = append(fields, zap.String("Comment", comment))
+		fields = append(fields, zap.Duration("Latency", latency))
+		fields = append(fields, zap.String("Response", blw.body.String()))
+
+		if comment != "" {
+			zapLogger.Error("Request", fields...)
+
+		} else {
+			zapLogger.Info("Request", fields...)
+		}
 	}
 }
 
@@ -99,7 +117,7 @@ func (e *GinMiddleware) ErrorHandler(logger *zap.Logger) gin.HandlerFunc {
 
 		c.Next()
 		if len(c.Errors) > 0 {
-			logger.Error("Error", zap.String("Error", c.Errors.String()))
+			//logger.Error("Error", zap.String("Error", c.Errors.String()))
 			//var message string
 			//statusCode := http.StatusInternalServerError
 			//err := c.Errors.Last()
