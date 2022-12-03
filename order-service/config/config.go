@@ -31,6 +31,7 @@ type (
 		Env      string `mapstructure:"env"`
 		UseRedis bool   `mapstructure:"useRedis"`
 		Port     int    `mapstructure:"port"`
+		MyURL    string `mapstructure:"myURL"`
 	}
 
 	Database struct {
@@ -55,6 +56,7 @@ type (
 	Services struct {
 		PaymentServiceURL string `mapstructure:"paymentServiceURL"`
 		ItemServiceURL    string `mapstructure:"itemServiceURL"`
+		DTMServiceURL     string `mapstructure:"dtmServiceURL"`
 	}
 )
 

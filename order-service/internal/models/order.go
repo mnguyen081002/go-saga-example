@@ -1,8 +1,6 @@
 package models
 
 import (
-	"time"
-
 	"github.com/lib/pq"
 )
 
@@ -19,10 +17,8 @@ type TierVariation struct {
 }
 
 type Order struct {
-	ID        int8           `json:"id" gorm:"primary_key"`
-	ItemIDs   pq.StringArray `json:"item_ids" gorm:"type:text[]"`
-	Status    string         `json:"status"`
-	CreatedAt time.Time      `gorm:"column:created_at;type:timestamp;default:now();not null" json:"created_at"`
-	UpdatedAt time.Time      `gorm:"column:updated_at;type:timestamp;default:now();not null" json:"updated_at"`
-	DeletedAt *time.Time     `gorm:"column:deleted_at;type:timestamp" json:"deleted_at"`
+	ID           int            `json:"id" gorm:"primary_key"`
+	GID          string         `json:"gid"`
+	OrderItemIDs pq.StringArray `json:"item_ids" gorm:"type:text[]"`
+	Status       string         `json:"status"`
 }

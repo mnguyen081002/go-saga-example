@@ -21,7 +21,7 @@ type Database struct {
 	logger *zap.Logger
 }
 
-func NewDatabase(config config.Config, logger *zap.Logger) *Database {
+func NewDatabase(config config.Config, logger *zap.Logger) *gorm.DB {
 	var err error
 	var sqlDB *sql.DB
 
@@ -48,7 +48,7 @@ func NewDatabase(config config.Config, logger *zap.Logger) *Database {
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(100)
 
-	return db
+	return db.DB
 }
 
 func getDatabaseInstance(config config.Config) (db *gorm.DB, err error) {
@@ -83,6 +83,7 @@ func getDatabaseInstance(config config.Config) (db *gorm.DB, err error) {
 func (d Database) RegisterTables() {
 	err := d.DB.AutoMigrate(
 		models.Order{},
+		models.OrderItem{},
 	)
 
 	if err != nil {

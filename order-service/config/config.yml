@@ -7,10 +7,12 @@ server:
   host: "0.0.0.0"
   env: "local"
   useRedis: false
+  myURL: "http://localhost:8080/api/order"
 
 services:
   itemServiceURL: "http://localhost:8082/api/item"
   paymentServiceURL: "http://localhost:8081/api/payment"
+  dtmServiceURL: "http://localhost:36789/api/dtmsvr"
 
 database:
   driver: "postgres"
