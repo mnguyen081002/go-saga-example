@@ -1,0 +1,21 @@
+---
+debug: true
+contextTimeout: 5
+
+server:
+  port: "80"
+  host: "0.0.0.0"
+  env: "dev"
+  useRedis: false
+
+services:
+  categoryServiceURL: "http://category-service/api/category/"
+  variantServiceURL: "http://variant-service/api/variant/"
+
+database:
+  driver: "postgres"
+  host: "postgres-replica-postgresql-ha-pgpool"
+  port: 5432
+  username: "postgres"
+  password: "yreWshXU5e"
+  name: "item-service"

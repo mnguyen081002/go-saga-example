@@ -1,0 +1,20 @@
+---
+debug: true
+contextTimeout: 5
+
+server:
+  port: "80"
+  host: "0.0.0.0"
+  env: "dev"
+  useRedis: false
+
+services:
+  paymentServiceURL: "http://payment-service/api/category/"
+
+database:
+  driver: "postgres"
+  host: "postgres"
+  port: 5432
+  username: "postgres"
+  password: "postgres"
+  name: "order-service"
