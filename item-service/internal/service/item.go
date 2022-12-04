@@ -97,7 +97,7 @@ func (s *ItemServiceImpl) CompensationStock(ctx context.Context, irs []dto.Order
 }
 
 func (s *ItemServiceImpl) Create(ctx context.Context, req dto.CreateItemRequest) (item models.Item, statusCode int, err error) {
-	err = s.db.Create(models.Item{
+	err = s.db.Create(&models.Item{
 		Name:         req.Name,
 		Price:        req.Price,
 		PriceMax:     req.PriceMax,

@@ -82,6 +82,8 @@ func InitConfig() {
 	case constants.Dev:
 		configFile = ConfigDevFile
 		fmt.Printf("gin mode: %s,config file: %s\n", gin.EnvGinMode, ConfigDevFile)
+	default:
+		configFile = ConfigDefaultFile
 	}
 	viper.SetConfigType(configType)
 	viper.SetConfigFile(configFile)

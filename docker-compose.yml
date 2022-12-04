@@ -1,0 +1,54 @@
+version: "3.9"
+services:
+  order-service:
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile
+    environment:
+      - ENV=local
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+
+  payment-service:
+    build:
+      context: ./payment-service
+      dockerfile: Dockerfile
+    environment:
+      - ENV=local
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+
+  item-service:
+    build:
+      context: ./item-service
+      dockerfile: Dockerfile
+    environment:
+      - ENV=local
+    ports:
+      - "8082:80"
+    depends_on:
+      - db
+
+  dtm-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "36789:36789"
+
+  db:
+    image: postgres:12.2
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - "5436:5432"
+    volumes:
+      - ./data:/var/lib/postgresql/data/pgdata
+      - ./db:/docker-entrypoint-initdb.d/

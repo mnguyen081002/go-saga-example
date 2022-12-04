@@ -3,8 +3,8 @@ debug: true
 contextTimeout: 5
 
 server:
-  port: "8082"
-  host: "127.0.0.1"
+  port: "80"
+  host: "0.0.0.0"
   env: "local"
   useRedis: false
 
@@ -12,8 +12,8 @@ services:
 
 database:
   driver: "postgres"
-  host: "localhost"
+  host: "db"
   port: 5432
   username: "postgres"
   password: "postgres"
-  name: "item-service"
+  name: "item_service"

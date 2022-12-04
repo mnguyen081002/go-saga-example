@@ -76,6 +76,9 @@ func NewConfig() Config {
 
 func InitConfig() {
 	var configFile string
+
+	fmt.Println(os.Getenv("ENV"),"!!!!!!!!!!!!!!!!!!!!!")
+
 	switch os.Getenv("ENV") {
 	case constants.Local:
 		configFile = ConfigDefaultFile
@@ -86,6 +89,8 @@ func InitConfig() {
 	case constants.Dev:
 		configFile = ConfigDevFile
 		fmt.Printf("gin mode: %s,config file: %s\n", gin.EnvGinMode, ConfigDevFile)
+	default:
+		configFile = ConfigDefaultFile
 	}
 	viper.SetConfigType(configType)
 	viper.SetConfigFile(configFile)
