@@ -1,4 +1,4 @@
-# Golang Sage Pattern with DTM
+# Golang Saga Pattern with DTM
 Orchestration saga example with docker compose, golang and dtm
 ## What is DTM
 
