@@ -1,4 +1,9 @@
-# Sage Pattern with DTM 
+# Golang Sage Pattern with DTM
 
-### What is DTM
+## What is DTM
+
 DTM is a distributed transaction framework which provides cross-service eventual data consistency. It provides saga, tcc, xa, 2-phase message, outbox, workflow patterns for a variety of application scenarios.
+
+## Architecture
+
+![Architecture Overview](./assets/SagaDiagram.png)
